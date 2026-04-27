@@ -26,3 +26,19 @@ export const getAuthMe = async () => {
     "/auth/me"
   );
 };
+
+
+export const registerCollege = async (data: any) => {
+  try {
+    const response = await apiConnector(
+      "POST",
+      "/auth/register",   // ✅ correct API
+      data
+    );
+
+    return response;
+
+  } catch (error: any) {
+    throw error?.response?.data?.message || error.message;
+  }
+};

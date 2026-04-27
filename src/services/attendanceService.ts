@@ -1,72 +1,3 @@
-// const BASE_URL = "http://localhost:5000/api";
-
-// const getAuthHeaders = () => ({
-//   "Content-Type": "application/json",
-//   Authorization: `Bearer ${localStorage.getItem("token")}`,
-// });
-
-// export const markAttendance = async (payload: any) => {
-//   const res = await fetch(`${BASE_URL}/attendance/mark`, {
-//     method: "POST",
-//     headers: getAuthHeaders(),
-//     body: JSON.stringify(payload),
-//   });
-
-//   return await res.json();
-// };
-
-// export const getStudentsForAttendance = async (
-//   semesterId: number
-// ) => {
-//   const res = await fetch(
-//     `${BASE_URL}/students?semesterId=${semesterId}`,
-//     {
-//       headers: getAuthHeaders(),
-//     }
-//   );
-
-//   return await res.json();
-// };
-// export const getStudentAttendance = async (studentId: number) => {
-//   const res = await fetch(
-//     `${BASE_URL}/attendance/student/${studentId}`,
-//     {
-//       headers: getAuthHeaders(),
-//     }
-//   );
-
-//   return await res.json();
-// };
-
-// export const getMonthlyAttendance = async (
-//   studentId: number,
-//   month: number,
-//   year: number
-// ) => {
-//   const res = await fetch(
-//     `${BASE_URL}/attendance/monthly?studentId=${studentId}&month=${month}&year=${year}`,
-//     {
-//       headers: getAuthHeaders(),
-//     }
-//   );
-
-//   return await res.json();
-// };
-
-// export const getSubjectWiseAttendance = async (
-//   studentId: number
-// ) => {
-//   const res = await fetch(
-//     `${BASE_URL}/attendance/subject-wise/${studentId}`,
-//     {
-//       headers: getAuthHeaders(),
-//     }
-//   );
-
-//   return await res.json();
-// };
-
-
 import { apiConnector } from "./apiConncetor";
 
 /**
@@ -103,6 +34,8 @@ export const getStudentsForAttendance = async (
     return [];
   }
 };
+
+
 export const updateAttendance = async (
   sessionId: number,
   payload: any
@@ -224,5 +157,18 @@ export const getSubjectWiseAttendance = async (
       error
     );
     return [];
+  }
+};
+
+// 🔥 ADD THIS
+export const getMyAttendance = async () => {
+  try {
+    return await apiConnector(
+      "GET",
+      "/attendance/my-attendance"
+    );
+  } catch (error) {
+    console.error("Get My Attendance Error:", error);
+    return null;
   }
 };

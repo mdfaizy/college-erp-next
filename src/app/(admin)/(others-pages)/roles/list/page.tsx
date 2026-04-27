@@ -61,24 +61,27 @@
 
 import React, { useEffect, useState } from "react";
 import { getRoles } from "@/services/roleService";
-import { Shield, Plus, Edit, Trash2, Users, Key, ChevronRight, Search, Filter } from "lucide-react";
+import { Shield, Plus, Edit, Trash2, Users, Key, ChevronRight, Search, Filter, Eye } from "lucide-react";
 import { Role } from "@/types/role";
-
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 export default function RoleListPage() {
   // const [roles, setRoles] = useState<any[]>([]);
-  
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   // const [selectedRole, setSelectedRole] = useState<any>(null);
 
 const [roles, setRoles] = useState<Role[]>([]);
 const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-
+const [deleteRole, setDeleteRole] = useState<Role | null>(null);
+const [showDeleteModal, setShowDeleteModal] = useState(false);
   useEffect(() => {
     const fetchRoles = async () => {
       try {
         setLoading(true);
         const res = await getRoles();
+        console.log(res);
         setRoles(res || []);
       } catch (error) {
         console.error("Error fetching roles:", error);
@@ -111,6 +114,29 @@ const [selectedRole, setSelectedRole] = useState<Role | null>(null);
     return colors[roleName?.toLowerCase()] || "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300";
   };
 
+  const handleDeleteClick = (role: Role) => {
+  setDeleteRole(role);
+  setShowDeleteModal(true);
+};
+
+const confirmDelete = async () => {
+  try {
+    // 👉 API call here
+    // await deleteRoleAPI(deleteRole.id);
+
+    toast.success("Role deleted successfully");
+
+    setShowDeleteModal(false);
+
+    // refresh list
+    setRoles((prev) =>
+      prev.filter((r) => r.id !== deleteRole?.id)
+    );
+
+  } catch (err) {
+    toast.error("Delete failed");
+  }
+};
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-8">
@@ -275,7 +301,7 @@ const [selectedRole, setSelectedRole] = useState<Role | null>(null);
                           </div>
                          </td>
                         
-                        <td className="px-6 py-4 text-right">
+                        {/* <td className="px-6 py-4 text-right">
                           <div className="flex items-center justify-end gap-2">
                             <button 
                                       onClick={(e) => e.stopPropagation()}
@@ -294,7 +320,37 @@ const [selectedRole, setSelectedRole] = useState<Role | null>(null);
                               className={`text-gray-400 transition-transform ${selectedRole?.id === role.id ? 'rotate-90' : ''}`}
                             />
                           </div>
-                         </td>
+                         </td> */}
+
+                         <button 
+  onClick={(e) => {
+    e.stopPropagation();
+    router.push(`/roles/view/${role.id}`); // 👁️ view page
+  }}
+  className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
+>
+  <Eye size={18} />
+</button>
+
+<button 
+  onClick={(e) => {
+    e.stopPropagation();
+    router.push(`/roles/edit/${role.id}`); // ✏️ edit page
+  }}
+  className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+>
+  <Edit size={18} />
+</button>
+
+<button 
+  onClick={(e) => {
+    e.stopPropagation();
+    handleDeleteClick(role); // 🗑️ modal open
+  }}
+  className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+>
+  <Trash2 size={18} />
+</button>
                        </tr>
                     ))
                   ) : (
@@ -355,6 +411,46 @@ const [selectedRole, setSelectedRole] = useState<Role | null>(null);
           )}
         </div>
       </div>
+
+
+
+      {showDeleteModal && (
+  <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl w-[400px] shadow-xl">
+
+      <h2 className="text-lg font-bold mb-2 text-gray-800 dark:text-white">
+        Delete Role
+      </h2>
+
+      <p className="text-sm text-gray-500 mb-4">
+        Are you sure you want to delete{" "}
+        <span className="font-semibold text-red-600">
+          {deleteRole?.name}
+        </span>?
+      </p>
+
+      <div className="flex justify-end gap-3">
+        <button
+          onClick={() => setShowDeleteModal(false)}
+          className="px-4 py-2 border rounded-lg"
+        >
+          Cancel
+        </button>
+
+        <button
+          onClick={confirmDelete}
+          className="px-4 py-2 bg-red-600 text-white rounded-lg"
+        >
+          Delete
+        </button>
+      </div>
+
     </div>
+  </div>
+)}
+    </div>
+
+
+
   );
 }

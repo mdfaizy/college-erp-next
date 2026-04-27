@@ -627,7 +627,7 @@ export default function TeacherAttendanceFilters({
       ]);
 
     setCourses(courseData || []);
-    setSessions(sessionData || []);
+    setSessions(sessionData.data || []);
   };
 
   const handleCourseChange = async (
@@ -648,7 +648,7 @@ export default function TeacherAttendanceFilters({
     const deps =
       await getDepartments(courseId);
 
-    setDepartments(deps || []);
+    setDepartments(deps.data || []);
   };
 
   const handleDepartmentChange =
@@ -670,8 +670,9 @@ export default function TeacherAttendanceFilters({
           departmentId
         );
 
-      setSemesters(sems || []);
-    };
+        setSemesters(sems.data || []);
+        console.log(sems)
+      };
 
   const handleSemesterChange =
     async (

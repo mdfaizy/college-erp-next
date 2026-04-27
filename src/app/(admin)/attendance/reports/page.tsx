@@ -8,6 +8,7 @@ import {
 import AttendanceFilters from "@/components/attendance/AttendanceFilters";
 import AttendanceSummaryCards from "@/components/attendance/AttendanceSummaryCards";
 import AttendanceTable from "@/components/attendance/AttendanceTable";
+import MyAttendanceCard from "@/components/attendance/MyAttendanceCard";
 
 export default function AttendanceReportsPage() {
   const [month, setMonth] = useState(4);
@@ -38,7 +39,9 @@ export default function AttendanceReportsPage() {
       <h1 className="text-2xl font-bold mb-6">
         Attendance Report
       </h1>
-
+<div className="mb-6">
+      <MyAttendanceCard />
+    </div>
       <AttendanceFilters
         month={month}
         year={year}

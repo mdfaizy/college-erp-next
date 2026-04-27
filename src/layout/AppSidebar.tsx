@@ -5,34 +5,34 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import {
-  // Box,
-  
   ChevronDown,
   LayoutGrid,
-  // MoreHorizontal,
   List,
   FileText,
   PieChart,
-  // Plug,
-  // Table,
+
   UserCircle,
 } from "lucide-react";
-
+import { useSelector } from "react-redux";
 type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  roles?: string[];
+  permissions?: string[]; 
+  subItems?: { name: string; path: string; pro?: boolean; new?: boolean ,roles?: string[],permissions?: string[]}[];
 };
 
 const navItems: NavItem[] = [
  {
   icon: <LayoutGrid />,
   name: "My Account",
+  roles: ["STUDENT"],
   subItems: [
     { name: "Complete Profile", path: "/students/complete-profile" },
-    { name: "Results", path: "/results" },
-    { name: "Attendance", path: "/attendance" },
+    { name: "Results", path: "/result/my-results" },
+    { name: "Attendance", path: "/attendance/my-attendance" },
+    {name:"Fees",path:"/students/fees"}
   ],
 },
 
@@ -60,14 +60,22 @@ const navItems: NavItem[] = [
      ],
   },
 {
-    name: "Students",
-    icon: <UserCircle />,
-    subItems: [
-      { name: "Student List", path: "/students/list" },
-      { name: "Add Student", path: "/students/create" },
-      
-    ],
-  },
+  name: "Students",
+  icon: <UserCircle />,
+  // permissions: ["VIEW_STUDENT"], // 👈 main menu ke liye
+  subItems: [
+    {
+      name: "Student List",
+      path: "/students/list",
+      permissions: ["VIEW_STUDENT"],
+    },
+    {
+      name: "Add Student",
+      path: "/students/create",
+      permissions: ["CREATE_STUDENT"],
+    },
+  ],
+},
   {
     name: "Teachers",
     icon: <UserCircle />,
@@ -90,8 +98,30 @@ const navItems: NavItem[] = [
     icon: <UserCircle />,
     subItems: [
       { name: "Create Role", path: "/roles/create" },
-      { name: "Role List", path: "/role/list" },
+      { name: "Role List", path: "/roles/list" },
       // { name: "Roles & Permissions", path: "/roles/create" },
+    ],
+  },
+
+  {
+    name: "Fees",
+    icon: <UserCircle />,
+    subItems: [
+      { name: "Create Fees", path: "/fees/create" },
+      { name: "Fees List", path: "/fees/list" },
+      { name: "Fees Assign", path: "/fees/assign" },
+      { name: "Report", path: "/fees/report" },
+    ],
+  },
+
+    {
+    name: "Result",
+    icon: <UserCircle />,
+    subItems: [
+      { name: "Create Exame", path: "/result/create-eame" },
+      { name: "List", path: "/result/list" },
+      { name: "Semister Result", path: "/result/semester-result" },
+      { name: "Submit Result", path: "/result/submit-result" },
     ],
   },
   {
@@ -123,14 +153,14 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "Create Hostel", path: "/hostel/create-hostel" },
       { name: "Hostel List", path: "/hostel/list" },
-      { name: "Create Floor", path: "/hostel/floors/create-floor" },
-      { name: "Floor List", path: "/hostel/floors/list" },
-      { name: "Create Room", path: "/hostel/rooms/create-room" },
-      { name: "Room List", path: "/hostel/rooms/list" },
+      // { name: "Create Floor", path: "/hostel/floors/create-floor" },
+      // { name: "Floor List", path: "/hostel/floors/list" },
+      // { name: "Create Room", path: "/hostel/rooms/create-room" },
+      // { name: "Room List", path: "/hostel/rooms/list" },
       { name: "Transfer Hostel", path: "/hostel/transfer" },
       { name: "Assign Hostel", path: "/hostel/assign" },
       { name: "Acclocates Hostel", path: "/hostel/allocations" },
-      { name: "Acclocates Hostel", path: "/hostel/allocations/list" },
+      // { name: "Acclocates Hostel", path: "/hostel/allocations/list" },
     ],
   },
   {
@@ -169,40 +199,59 @@ const navItems: NavItem[] = [
   },
 ];
 
-// const othersItems: NavItem[] = [
-//   {
-//     icon: <UserCircle />,
-//     name: "Charts",
-//     subItems: [
-//       { name: "Line Chart", path: "/line-chart", pro: false },
-//       { name: "Bar Chart", path: "/bar-chart", pro: false },
-//     ],
-//   },
-//   {
-//     icon: <Box />,
-//     name: "UI Elements",
-//     subItems: [
-//       { name: "Alerts", path: "/alerts", pro: false },
-//       { name: "Avatar", path: "/avatars", pro: false },
-//       { name: "Badge", path: "/badge", pro: false },
-//       { name: "Buttons", path: "/buttons", pro: false },
-//       { name: "Images", path: "/images", pro: false },
-//       { name: "Videos", path: "/videos", pro: false },
-//     ],
-//   },
-//   {
-//     icon: <UserCircle />,
-//     name: "Authentication",
-//     subItems: [
-//       { name: "Sign In", path: "/signin", pro: false },
-//       { name: "Sign Up", path: "/signup", pro: false },
-//     ],
-//   },
-// ];
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+
+  
+  const user = useSelector((state: any) => state.auth.user);
+  console.log(user);
+const role = user?.roles?.[0]?.role?.name;
+  const isStudent = role === "STUDENT";
+  console.log("ROLE =>", role);
+console.log("IS STUDENT =>", isStudent);
+// const permissions: string[] = user?.permissions || [];
+const permissions: string[] =
+  user?.roles?.flatMap((r: any) =>
+    r.role?.privileges?.map((p: any) => p.permission?.key)
+  ).filter(Boolean) || [];
+  console.log("RAW ROLES =>", user?.roles); 
+console.log("PERMISSIONS =>", permissions);
+
+const hasPermissionAccess = (requiredPermissions?: string[]) => {
+  if (!requiredPermissions) return true;
+  return requiredPermissions.some((p) => permissions.includes(p));
+};
+const hasRoleAccess = (roles?: string[]) => {
+  if (!roles) return true; // agar role define nahi hai → sabko dikhega
+  return roles.includes(role);
+};
+const filteredNavItems = navItems
+  .map((nav) => {
+
+    // ✅ STUDENT → sirf student wala menu dikhe
+    if (isStudent) {
+      if (!nav.roles?.includes("STUDENT")) return null;
+
+      return nav; // 👈 no permission check
+    }
+
+    // ✅ OTHER USERS → role + permission
+    if (!hasRoleAccess(nav.roles)) return null;
+    if (!hasPermissionAccess(nav.permissions)) return null;
+
+    const filteredSubItems = nav.subItems?.filter((sub) =>
+      hasRoleAccess(sub.roles) &&
+      hasPermissionAccess(sub.permissions)
+    );
+
+    return {
+      ...nav,
+      subItems: filteredSubItems,
+    };
+  })
+  .filter(Boolean);
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -456,7 +505,7 @@ const AppSidebar: React.FC = () => {
                   <UserCircle />
                 )}
               </h2>
-              {renderMenuItems(navItems, "main")}
+              {renderMenuItems(filteredNavItems, "main")}
             </div>
 
             {/* <div className="">

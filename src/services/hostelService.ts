@@ -45,7 +45,7 @@ export const getRooms = async () => {
 };
 
 export const getAllHostels = async () => {
-  return apiConnector("GET", "/hostel/all");
+  return apiConnector("GET", "/hostel/list");
 };
 
 export const toggleHostel = async (

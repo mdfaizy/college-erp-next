@@ -10,6 +10,13 @@ export const getStudents = async () => {
   return await apiConnector("GET", "/students"); // ✅ endpoint add
 };
 
+export const getStudentsBySemester = (
+  semester: number
+) =>
+  apiConnector(
+    "GET",
+    `/students/by-semester/${semester}`
+  );
 // export const completeStudentProfile = async (
 //   data: any
 // ) => {

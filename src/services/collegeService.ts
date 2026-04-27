@@ -1,23 +1,20 @@
 import { apiConnector } from "./apiConncetor";
 
 
-// export const createCollege = async (data: any) => {
-//   try {
-//     const response = await apiConnector(
-//       "POST",
-//          "/college/create",
-//       data,
-//       {
-//         "Content-Type": "application/json",
-//       }
-//     );
+export const createCollege = async (data: any) => {
+  try {
+    const response = await apiConnector(
+      "POST",
+      "/college",   // ✅ correct API
+      data
+    );
 
-//     return response.data;
+    return response;
 
-//   } catch (error: any) {
-//     throw error?.response?.data || error.message;
-//   }
-// };
+  } catch (error: any) {
+    throw error?.response?.data?.message || error.message;
+  }
+};
 
 export const toggleCollegeStatus = async (
   id: number

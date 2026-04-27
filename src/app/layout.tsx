@@ -1,6 +1,6 @@
 import { Outfit } from 'next/font/google';
 import './globals.css';
-
+import Script from "next/script"; 
 import { SidebarProvider } from '@/context/SidebarContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { ReduxProvider } from '@/components/redux/slices/ReduxProvider';
@@ -17,7 +17,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${outfit.className} dark:bg-gray-900`}>
-
+ {/* ✅ Razorpay Script */}
+        <Script src="https://checkout.razorpay.com/v1/checkout.js" />
         <ReduxProvider> 
         <ThemeProvider>
           <Toaster position="top-right" />

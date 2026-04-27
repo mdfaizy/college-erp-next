@@ -11,7 +11,8 @@ import {
   Loader2,
 } from "lucide-react";
 import React, { useState } from "react";
-import { createUser } from "@/services/userServices";
+// import { registerCollege } from "@/services/authService"; 
+import { createCollege } from "@/services/collegeService";
 import { toast } from "react-hot-toast";
 
 export default function RegisterCollege() {
@@ -50,7 +51,7 @@ export default function RegisterCollege() {
     try {
       setLoading(true);
 
-      await createUser(formData);
+    await createCollege(formData);
 
       toast.success(
         "College & Admin Created Successfully"

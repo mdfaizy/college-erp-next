@@ -393,6 +393,7 @@ export default function MarkAttendancePage() {
       
       setLoading(true);
       const data = await getStudentsForAttendance(filters.semesterId);
+      console.log("API RESPONSE 👉", data);
       setStudents(data || []);
       
       if (!data?.length) {
@@ -438,7 +439,8 @@ export default function MarkAttendancePage() {
           status: attendanceMap[student.id] || "present",
         })),
       };
-      
+      console.log("TEACHER ID 👉", payload.teacherId);
+      console.log("PAYLOAD 👉", payload);
       const res = await markAttendance(payload);
       toast.success(res.message || "Attendance marked successfully");
       

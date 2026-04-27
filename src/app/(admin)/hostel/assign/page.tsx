@@ -232,18 +232,333 @@
 
 
 
+// "use client";
+
+// import {
+//   useEffect,
+//   useState,
+// } from "react";
+
+// import {
+//   assignHostel,
+//   getHostels,
+//   getFloorsByHostel,
+//   getRoomsByFloor,
+//   getStudentAllocation,
+// } from "@/services/hostelService";
+
+// import { getStudents } from "@/services/studentService";
+
+// import Select from "@/components/form/Select";
+// import Label from "@/components/form/Label";
+// import Form from "@/components/form/Form";
+
+// export default function AssignHostelPage() {
+//   const [students, setStudents] =
+//     useState<any[]>([]);
+
+//   const [hostels, setHostels] =
+//     useState<any[]>([]);
+
+//   const [floors, setFloors] =
+//     useState<any[]>([]);
+
+//   const [rooms, setRooms] =
+//     useState<any[]>([]);
+
+//   const [loading, setLoading] =
+//     useState(false);
+
+//   const [currentAllocation, setCurrentAllocation] =
+//     useState<any>(null);
+
+//   const [form, setForm] = useState({
+//     studentId: "",
+//     hostelId: "",
+//     floorId: "",
+//     roomId: "",
+//   });
+
+//   useEffect(() => {
+//     fetchInitialData();
+//   }, []);
+
+//   const fetchInitialData = async () => {
+//     try {
+//       const [studentRes, hostelRes] =
+//         await Promise.all([
+//           getStudents(),
+//           getHostels(),
+//         ]);
+
+//       setStudents(
+//         studentRes.data.map(
+//           (student: any) => ({
+//             label: `${student.user?.name} (${student.id})`,
+//             value: String(student.id),
+//           })
+//         )
+//       );
+
+//       setHostels(
+//         hostelRes.data.map(
+//           (hostel: any) => ({
+//             label: hostel.name,
+//             value: String(hostel.id),
+//           })
+//         )
+//       );
+
+//     } catch (err) {
+//       console.error(err);
+//     }
+//   };
+
+//   const handleStudentChange =
+//     async (studentId: string) => {
+//       try {
+//         setForm({
+//           studentId,
+//           hostelId: "",
+//           floorId: "",
+//           roomId: "",
+//         });
+
+//         setFloors([]);
+//         setRooms([]);
+
+//         const res =
+//           await getStudentAllocation(
+//             Number(studentId)
+//           );
+
+//         setCurrentAllocation(
+//           res.data || null
+//         );
+
+//       } catch (err) {
+//         console.error(err);
+//       }
+//     };
+
+//   const handleHostelChange =
+//     async (hostelId: string) => {
+//       setForm((prev) => ({
+//         ...prev,
+//         hostelId,
+//         floorId: "",
+//         roomId: "",
+//       }));
+
+//       const res =
+//         await getFloorsByHostel(
+//           Number(hostelId)
+//         );
+
+//       setFloors(
+//         res.data.map((floor: any) => ({
+//           label: floor.name,
+//           value: String(floor.id),
+//         }))
+//       );
+
+//       setRooms([]);
+//     };
+
+//   const handleFloorChange =
+//     async (floorId: string) => {
+//       setForm((prev) => ({
+//         ...prev,
+//         floorId,
+//         roomId: "",
+//       }));
+
+//       const res =
+//         await getRoomsByFloor(
+//           Number(floorId)
+//         );
+
+//       setRooms(
+//         res.data.map((room: any) => ({
+//           label: `${room.roomNumber} (Available: ${
+//             room.capacity -
+//             room.occupiedBeds
+//           })`,
+//           value: String(room.id),
+//         }))
+//       );
+//     };
+
+//   const handleSubmit = async () => {
+//     try {
+//       setLoading(true);
+
+//       await assignHostel({
+//         studentId: Number(
+//           form.studentId
+//         ),
+//         roomId: Number(form.roomId),
+//       });
+
+//       alert(
+//         "Hostel Assigned Successfully"
+//       );
+
+//       setForm({
+//         studentId: "",
+//         hostelId: "",
+//         floorId: "",
+//         roomId: "",
+//       });
+
+//       setCurrentAllocation(null);
+//       setFloors([]);
+//       setRooms([]);
+
+//     } catch (err: any) {
+//       alert(
+//         err?.message ||
+//           "Assignment Failed"
+//       );
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   return (
+//     <div className="max-w-3xl mx-auto p-6">
+//       <div className="bg-white rounded-2xl shadow border p-8">
+//         <h1 className="text-2xl font-bold mb-6">
+//           Assign Hostel
+//         </h1>
+
+//         <Form
+//           onSubmit={handleSubmit}
+//           className="space-y-5"
+//         >
+//           {/* Student */}
+//           <div>
+//             <Label>Select Student</Label>
+
+//             <Select
+//               options={students}
+//               placeholder="Choose Student"
+//               defaultValue={form.studentId}
+//               onChange={
+//                 handleStudentChange
+//               }
+//             />
+//           </div>
+
+//           {/* Existing Allocation */}
+//           {currentAllocation && (
+//             <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-300">
+//               <p className="font-semibold text-yellow-700">
+//                 Student Already Assigned Hostel
+//               </p>
+
+//               <p className="text-sm mt-2">
+//                 Hostel:{" "}
+//                 {
+//                   currentAllocation
+//                     .hostel?.name
+//                 }
+//               </p>
+
+//               <p className="text-sm">
+//                 Floor:{" "}
+//                 {
+//                   currentAllocation
+//                     .floor?.name
+//                 }
+//               </p>
+
+//               <p className="text-sm">
+//                 Room:{" "}
+//                 {
+//                   currentAllocation
+//                     .room
+//                     ?.roomNumber
+//                 }
+//               </p>
+//             </div>
+//           )}
+
+//           {/* Hostel */}
+//           <div>
+//             <Label>Select Hostel</Label>
+
+//             <Select
+//               options={hostels}
+//               placeholder="Choose Hostel"
+//               defaultValue={form.hostelId}
+//               onChange={
+//                 handleHostelChange
+//               }
+//             />
+//           </div>
+
+//           {/* Floor */}
+//           <div>
+//             <Label>Select Floor</Label>
+
+//             <Select
+//               options={floors}
+//               placeholder="Choose Floor"
+//               defaultValue={form.floorId}
+//               onChange={
+//                 handleFloorChange
+//               }
+//             />
+//           </div>
+
+//           {/* Room */}
+//           <div>
+//             <Label>Select Room</Label>
+
+//             <Select
+//               options={rooms}
+//               placeholder="Choose Room"
+//               defaultValue={form.roomId}
+//               onChange={(value) =>
+//                 setForm((prev) => ({
+//                   ...prev,
+//                   roomId: value,
+//                 }))
+//               }
+//             />
+//           </div>
+
+//           {/* Button */}
+//           <button
+//             type="submit"
+//             disabled={
+//               loading ||
+//               !!currentAllocation
+//             }
+//             className="w-full h-11 rounded-lg bg-green-600 text-white disabled:opacity-50"
+//           >
+//             {loading
+//               ? "Assigning..."
+//               : currentAllocation
+//               ? "Already Assigned"
+//               : "Assign Hostel"}
+//           </button>
+//         </Form>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
 "use client";
 
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useEffect, useState } from "react";
 
 import {
   assignHostel,
   getHostels,
-  getFloorsByHostel,
-  getRoomsByFloor,
   getStudentAllocation,
 } from "@/services/hostelService";
 
@@ -254,29 +569,16 @@ import Label from "@/components/form/Label";
 import Form from "@/components/form/Form";
 
 export default function AssignHostelPage() {
-  const [students, setStudents] =
-    useState<any[]>([]);
-
-  const [hostels, setHostels] =
-    useState<any[]>([]);
-
-  const [floors, setFloors] =
-    useState<any[]>([]);
-
-  const [rooms, setRooms] =
-    useState<any[]>([]);
-
-  const [loading, setLoading] =
-    useState(false);
-
+  const [students, setStudents] = useState<any[]>([]);
+  const [hostels, setHostels] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
   const [currentAllocation, setCurrentAllocation] =
     useState<any>(null);
 
   const [form, setForm] = useState({
     studentId: "",
     hostelId: "",
-    floorId: "",
-    roomId: "",
+    semester: "",
   });
 
   useEffect(() => {
@@ -292,129 +594,65 @@ export default function AssignHostelPage() {
         ]);
 
       setStudents(
-        studentRes.data.map(
-          (student: any) => ({
-            label: `${student.user?.name} (${student.id})`,
-            value: String(student.id),
-          })
-        )
+        studentRes.data.map((student: any) => ({
+          label: `${student.user?.name} (${student.id})`,
+          value: String(student.id),
+        }))
       );
 
       setHostels(
-        hostelRes.data.map(
-          (hostel: any) => ({
-            label: hostel.name,
-            value: String(hostel.id),
-          })
-        )
+        hostelRes.data.map((hostel: any) => ({
+          label: `${hostel.name} (${hostel.type})`,
+          value: String(hostel.id),
+        }))
       );
-
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handleStudentChange =
-    async (studentId: string) => {
-      try {
-        setForm({
-          studentId,
-          hostelId: "",
-          floorId: "",
-          roomId: "",
-        });
-
-        setFloors([]);
-        setRooms([]);
-
-        const res =
-          await getStudentAllocation(
-            Number(studentId)
-          );
-
-        setCurrentAllocation(
-          res.data || null
-        );
-
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-  const handleHostelChange =
-    async (hostelId: string) => {
-      setForm((prev) => ({
-        ...prev,
-        hostelId,
-        floorId: "",
-        roomId: "",
-      }));
+  const handleStudentChange = async (
+    studentId: string
+  ) => {
+    try {
+      setForm({
+        studentId,
+        hostelId: "",
+        semester: "",
+      });
 
       const res =
-        await getFloorsByHostel(
-          Number(hostelId)
+        await getStudentAllocation(
+          Number(studentId)
         );
 
-      setFloors(
-        res.data.map((floor: any) => ({
-          label: floor.name,
-          value: String(floor.id),
-        }))
+      setCurrentAllocation(
+        res.data || null
       );
-
-      setRooms([]);
-    };
-
-  const handleFloorChange =
-    async (floorId: string) => {
-      setForm((prev) => ({
-        ...prev,
-        floorId,
-        roomId: "",
-      }));
-
-      const res =
-        await getRoomsByFloor(
-          Number(floorId)
-        );
-
-      setRooms(
-        res.data.map((room: any) => ({
-          label: `${room.roomNumber} (Available: ${
-            room.capacity -
-            room.occupiedBeds
-          })`,
-          value: String(room.id),
-        }))
-      );
-    };
+    } catch {
+      setCurrentAllocation(null);
+    }
+  };
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
 
       await assignHostel({
-        studentId: Number(
-          form.studentId
-        ),
-        roomId: Number(form.roomId),
+        studentId: Number(form.studentId),
+        hostelId: Number(form.hostelId),
+        semester: Number(form.semester),
       });
 
-      alert(
-        "Hostel Assigned Successfully"
-      );
+      alert("Hostel Assigned Successfully");
 
       setForm({
         studentId: "",
         hostelId: "",
-        floorId: "",
-        roomId: "",
+        semester: "",
       });
 
       setCurrentAllocation(null);
-      setFloors([]);
-      setRooms([]);
-
     } catch (err: any) {
       alert(
         err?.message ||
@@ -436,21 +674,16 @@ export default function AssignHostelPage() {
           onSubmit={handleSubmit}
           className="space-y-5"
         >
-          {/* Student */}
           <div>
             <Label>Select Student</Label>
-
             <Select
               options={students}
               placeholder="Choose Student"
               defaultValue={form.studentId}
-              onChange={
-                handleStudentChange
-              }
+              onChange={handleStudentChange}
             />
           </div>
 
-          {/* Existing Allocation */}
           {currentAllocation && (
             <div className="p-4 rounded-lg bg-yellow-50 border border-yellow-300">
               <p className="font-semibold text-yellow-700">
@@ -459,82 +692,59 @@ export default function AssignHostelPage() {
 
               <p className="text-sm mt-2">
                 Hostel:{" "}
-                {
-                  currentAllocation
-                    .hostel?.name
-                }
+                {currentAllocation.hostel?.name}
               </p>
 
               <p className="text-sm">
-                Floor:{" "}
-                {
-                  currentAllocation
-                    .floor?.name
-                }
-              </p>
-
-              <p className="text-sm">
-                Room:{" "}
-                {
-                  currentAllocation
-                    .room
-                    ?.roomNumber
-                }
+                Semester:{" "}
+                {currentAllocation.semester}
               </p>
             </div>
           )}
 
-          {/* Hostel */}
           <div>
             <Label>Select Hostel</Label>
-
             <Select
               options={hostels}
               placeholder="Choose Hostel"
               defaultValue={form.hostelId}
-              onChange={
-                handleHostelChange
-              }
-            />
-          </div>
-
-          {/* Floor */}
-          <div>
-            <Label>Select Floor</Label>
-
-            <Select
-              options={floors}
-              placeholder="Choose Floor"
-              defaultValue={form.floorId}
-              onChange={
-                handleFloorChange
-              }
-            />
-          </div>
-
-          {/* Room */}
-          <div>
-            <Label>Select Room</Label>
-
-            <Select
-              options={rooms}
-              placeholder="Choose Room"
-              defaultValue={form.roomId}
               onChange={(value) =>
                 setForm((prev) => ({
                   ...prev,
-                  roomId: value,
+                  hostelId: value,
                 }))
               }
             />
           </div>
 
-          {/* Button */}
+          <div>
+            <Label>Semester</Label>
+            <Select
+              options={[
+                { label: "1", value: "1" },
+                { label: "2", value: "2" },
+                { label: "3", value: "3" },
+                { label: "4", value: "4" },
+                { label: "5", value: "5" },
+                { label: "6", value: "6" },
+                { label: "7", value: "7" },
+                { label: "8", value: "8" },
+              ]}
+              placeholder="Select Semester"
+              defaultValue={form.semester}
+              onChange={(value) =>
+                setForm((prev) => ({
+                  ...prev,
+                  semester: value,
+                }))
+              }
+            />
+          </div>
+
           <button
             type="submit"
             disabled={
-              loading ||
-              !!currentAllocation
+              loading || !!currentAllocation
             }
             className="w-full h-11 rounded-lg bg-green-600 text-white disabled:opacity-50"
           >

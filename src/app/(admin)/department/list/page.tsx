@@ -14,10 +14,10 @@ export default function DepartmentListPage() {
   const [loading, setLoading] = useState(false);
 
   const fetchDepartments = async () => {
-    try {
+    try { 
       setLoading(true);
       const res = await getDepartments();
-      setDepartments(res); // अगर res.data.data हो तो adjust करना
+      setDepartments(res.data); // अगर res.data.data हो तो adjust करना
     } catch (err) {
       console.error("Error fetching departments", err);
     } finally {
